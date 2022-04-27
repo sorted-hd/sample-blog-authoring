@@ -16,7 +16,7 @@ export const formValidationSchema = yup.object({
   password: yup.string().required().min(8),
 });
 
-export function Login() {
+export function Login(props) {
   // For initial setup
   const [users, setUSers] = useState([]);
   const [userName, setUserName] = useState('');
@@ -68,6 +68,8 @@ export function Login() {
         console.log(responseReceived.data);
         // Stored in local storage
         localStorage.setItem('users', JSON.stringify(responseReceived.data));
+
+        props.loginHandler();
         history.push('/blog/home');
       } else {
         throw new Error('Network Error');

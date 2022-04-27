@@ -1,5 +1,6 @@
 import './index.css';
 
+import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
 
 import AppBar from '@mui/material/AppBar';
@@ -7,16 +8,28 @@ import Button from '@mui/material/Button';
 import { EditBlog } from './EditBlog';
 import { Home } from './Home';
 import { Login } from './Login';
-import React from 'react';
 import { Register } from './Register';
 import Toolbar from '@mui/material/Toolbar';
 
 export default function App() {
   const history = useHistory();
+  const [isUserLogged, setIsUserLogged] = useState(false);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('users'));
+    if (user && user.user) {
+      setIsUserLogged(true);
+    }
+  }, []);
+
+  const loginHandler = () => {
+    setIsUserLogged(true);
+  };
 
   const logoutHandler = (event) => {
     // Delete user saved in localStorage
     localStorage.removeItem('users');
+    setIsUserLogged(false);
     history.push('/');
   };
 
@@ -24,26 +37,28 @@ export default function App() {
     <div className="App">
       <AppBar color="success" position="static">
         <Toolbar>
-          <Button color="inherit" onClick={() => history.push('/blog/home')}>
-            Home
-          </Button>
-          {
+          {isUserLogged && (
+            <Button color="inherit" onClick={() => history.push('/blog/home')}>
+              Home
+            </Button>
+          )}
+          {!isUserLogged && (
             <Button
               color="inherit"
               onClick={() => history.push('/blog/signup')}
             >
               SIGN UP
             </Button>
-          }
+          )}
 
-          {
+          {!isUserLogged && (
             <Button
               color="inherit"
               onClick={() => history.push('/blog/signin')}
             >
               SIGN IN
             </Button>
-          }
+          )}
           {
             <Button color="inherit" onClick={logoutHandler}>
               LOGOUT
@@ -65,11 +80,12 @@ export default function App() {
         </Route>
 
         <Route path="/blog/signup">
+          {' '}
           <Register />
         </Route>
 
         <Route path="/blog/signin">
-          <Login />
+          <Login loginHandler={loginHandler} />
         </Route>
 
         <Route path="/blog/home">

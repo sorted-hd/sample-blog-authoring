@@ -64,6 +64,7 @@ export function Bloglist() {
       if (responseReceived.status === StatusCodes.OK) {
         let nBlogs = [...responseReceived.data];
         setBlog(nBlogs);
+        console.log(blog);
       } else {
         throw new Error('Network Error');
       }
@@ -78,12 +79,28 @@ export function Bloglist() {
   }, []);
 
   // To delete the blog from bloglist
-  const deleteBlog = (id) => {
-    fetch('https://618fa736f6bf4500174849a7.mockapi.io/blog/' + id, {
-      method: 'DELETE',
-    })
-      .then((data) => data.json())
-      .then(() => getBlogs());
+  const deleteBlog = async (blogData) => {
+    console.log(blogData);
+    try {
+      const user = JSON.parse(localStorage.getItem('users'));
+      console.log(user.jwttoken.token);
+      const responseReceived = await axios.delete(
+        config.BACKEND_URL_POSTS.concat(`deleteBlog/${blogData.userId}`),
+        {
+          data: blogData,
+          headers: {
+            Authorization: `Bearer ${user.jwttoken.token}`,
+          },
+        }
+      );
+      if (responseReceived.status !== StatusCodes.OK) {
+        throw new Error('Network Error');
+      }
+      alert('Post deleted Successfully');
+      window.location.reload();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   // To change url
@@ -115,7 +132,7 @@ export function Bloglist() {
               deleteButton={
                 <IconButton
                   style={{ marginLeft: 'auto' }}
-                  onClick={() => deleteBlog(blog.id)}
+                  onClick={() => deleteBlog(blog)}
                   aria-label="delete"
                   color="error"
                 >
