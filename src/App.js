@@ -59,11 +59,11 @@ export default function App() {
               SIGN IN
             </Button>
           )}
-          {
+          {isUserLogged && (
             <Button color="inherit" onClick={logoutHandler}>
               LOGOUT
             </Button>
-          }
+          )}
         </Toolbar>
       </AppBar>
 
